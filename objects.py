@@ -7,7 +7,7 @@ class Player:
         self.score = score
         self.bullet_list = []
     def shoot(self):
-        new_bullet = Bullet(self.x_pos, self.y_pos)
+        new_bullet = Bullet(self.x_pos + 45, self.y_pos)
         self.bullet_list.append(new_bullet)
     def move_right(self):
         self.x_pos += 5
