@@ -76,3 +76,21 @@ class Margem:
     def desenhar(self, tela):
         tela.blit(self.IMAGEM, (self.x, self.y1))
         tela.blit(self.IMAGEM, (self.x, self.y2))
+
+
+
+
+####### COLLISION
+#draw the image
+        imagem_plane = pygame(self.imagem)
+        # plane and rect have same center position
+        pos_centro_imagem = self.imagem.get_rect(topleft=(self.x, self.y)).center
+        # define rect in pygame and draw the picture inside the rect
+        retangulo = imagem_plane.get_rect(center=pos_centro_imagem)
+        # put on screen
+        tela.blit(imagem_plane, retangulo.topleft)
+
+
+    # If the plane's mask has common pixel to verify collision
+    def get_mask(self):
+        return pygame.mask.from_surface(self.imagem)
