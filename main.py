@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 import objects
 import physics
+import time
 
 # 2 - Initialize the game
 pygame.init()
@@ -77,9 +78,10 @@ while 1:
 
     # 12 - Checks for collisions and deaths
     physics.check_bullet_kill(p1, enemy_list)
-    if physics.check_enemy_collision(p1,enemy_list):
-        exit(0)
-    physics.check_scenario_collision(p1,bg_margins)
+    if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins):
+        screen.blit(objects.game_over,(0,0))
+        pygame.display.flip()
+        time.sleep(100)
 
 
 
