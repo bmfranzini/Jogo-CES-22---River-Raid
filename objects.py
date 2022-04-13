@@ -9,6 +9,8 @@ speed = 3
 
 bullet_fig = pygame.image.load("Images/bullet.png")
 player_fig = pygame.image.load("Images/player.png")
+fuel_fig = pygame.image.load("Images/fuel.png")
+fuel_fig = pygame.transform.scale(fuel_fig,(50,50))
 img_helicopter = pygame.image.load("Images/helicopter_enemy.png")
 img_zeppelin = pygame.image.load("Images/zeppelin_enemy.png")
 img_type1 = pygame.image.load("Images/margin_1_.png")
@@ -49,11 +51,16 @@ class Player:
         pass
 
     def draw(self, screen):
-        # self.img.get_rect(topleft=(self.x_pos, self.y_pos))
         screen.blit(self.img,(self.x_pos, self.y_pos))
 
     def get_mask(self):
         return pygame.mask.from_surface(self.img)
+
+    def draw_score(self, screen):
+        font = pygame.font.Font(None, 36)
+        text = font.render(f'Score: {self.score}', 1, (0, 0, 0))
+        textpos = text.get_rect(centerx = width / 2)
+        screen.blit(text, textpos)
 
 
 class Bullet:
@@ -63,12 +70,13 @@ class Bullet:
         self.y_pos = y_pos
         self.width = bullet_fig.get_width()
         self.height = bullet_fig.get_height()
+        self.img = bullet_fig
 
     def update(self):
         self.y_pos -= 5
 
     def draw(self, screen):
-        screen.blit(bullet_fig, (self.x_pos, self.y_pos))
+        screen.blit(self.img, (self.x_pos, self.y_pos))
 
 
 class Enemy: # Classe pai
@@ -97,7 +105,7 @@ class Helicopter(Enemy):
     def update(self):
         if self.dir == 'right':
             self.x_pos += self.x_speed
-        else:
+        elif self.dir == 'left':
             self.x_pos -= self.x_speed
         self.y_pos += speed
 
@@ -124,7 +132,7 @@ class Zeppelin(Enemy):
     def update(self):
         if self.dir == 'right':
             self.x_pos += self.x_speed
-        else:
+        elif self.dir == 'left':
             self.x_pos -= self.x_speed
         self.y_pos += speed
 
@@ -149,6 +157,10 @@ class Bird:
 
 def update_enemies(enemy_list):
     if enemy_list == []:
+        new_enemy = True
+    else:
+        new_enemy = random.random() < 0.01/(len(enemy_list))**2
+    if new_enemy:
         temp1 = random.choice([1, 2])
         temp2 = random.choice([1, 2])
         x0 = random.randrange(0, width)
@@ -169,6 +181,33 @@ def draw_enemies(enemy_list, screen):
     for enemy in enemy_list:
         enemy.draw(screen)
 
+class Fuel:
+    def __init__(self, x_pos, y_pos):
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+        self.img = fuel_fig
+
+    def update(self):
+        self.y_pos += speed
+    def draw(self, screen):
+        screen.blit(self.img, (self.x_pos, self.y_pos))
+    def get_mask(self):
+        return pygame.mask.from_surface(self.img)
+
+def update_fuel(fuel_list):
+    if fuel_list == [] and random.random() < 0.001:
+        x0 = random.randrange(0, width)
+        fuel_list.append(Fuel(x0,0))
+    for fuel in fuel_list:
+        fuel.update()
+        if fuel.y_pos > height:
+            fuel_list.remove(fuel)
+        elif fuel.x_pos > width or fuel.x_pos<0:
+            fuel.flip()
+
+def draw_fuel(fuel_list, screen):
+    for fuel in fuel_list:
+        fuel.draw(screen)
 
 class Margin:
     global speed
