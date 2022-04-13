@@ -1,4 +1,4 @@
-
+from objects import max_fuel
 def check_scenario_collision(p1, bg_margins):  # checks if player has collided with background elements
     player_mask = p1.get_mask()
     y_margin = []
@@ -32,7 +32,7 @@ def check_bullet_kill(p1, enemy_list):  # checks if any bullet has reached an en
             if (bullet.y_pos - enemy.y_pos < enemy.height and enemy.y_pos - bullet.y_pos < bullet.height) and (bullet.x_pos - enemy.x_pos < enemy.width and enemy.x_pos - bullet.x_pos < bullet.width):
                 enemy_list.remove(enemy)
                 p1.bullet_list.remove(bullet)
-                p1.score += 100
+                p1.score += max_fuel
                 break
 
 def check_fuel_collision(p1, fuel_list):
@@ -42,6 +42,6 @@ def check_fuel_collision(p1, fuel_list):
         distance = (fuel.x_pos - p1.x_pos, fuel.y_pos - p1.y_pos)
         collision = player_mask.overlap(fuel_mask, distance)
         if collision:
-            p1.fuel = 100
+            p1.fuel = 1000
             fuel_list.remove(fuel)
             break

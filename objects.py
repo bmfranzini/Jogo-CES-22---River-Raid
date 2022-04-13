@@ -4,6 +4,7 @@ import random
 width = 750
 height = 750
 player_y = 600
+max_fuel = 1000
 
 speed = 3
 
@@ -22,7 +23,7 @@ img_type2r = pygame.transform.scale(img_type2r, (250, 750))
 game_over = pygame.image.load("Images/Game_Over.png")
 margin_left = [(0,img_type1), (0,img_type2l)]
 margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get_width(),img_type2r)]
-
+max_width =  max(img_type1.get_width(), img_type2r.get_width())
 
 class Player:
 
@@ -59,7 +60,13 @@ class Player:
     def draw_score(self, screen):
         font = pygame.font.Font(None, 36)
         text = font.render(f'Score: {self.score}', 1, (0, 0, 0))
-        textpos = text.get_rect(centerx = width / 2)
+        textpos = text.get_rect(centerx = width / 2 - 100)
+        screen.blit(text, textpos)
+
+    def draw_fuel(self, screen):
+        font = pygame.font.Font(None, 36)
+        text = font.render(f'Fuel: {self.fuel}', 1, (0, 0, 0))
+        textpos = text.get_rect(centerx = width / 2 + 100)
         screen.blit(text, textpos)
 
 
@@ -194,9 +201,10 @@ class Fuel:
     def get_mask(self):
         return pygame.mask.from_surface(self.img)
 
-def update_fuel(fuel_list):
-    if fuel_list == [] and random.random() < 0.001:
-        x0 = random.randrange(0, width)
+def update_fuel(fuel_list, p1):
+    p1.fuel -= 1
+    if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 100):
+        x0 = random.randrange(max_width, width-max_width) 
         fuel_list.append(Fuel(x0,0))
     for fuel in fuel_list:
         fuel.update()

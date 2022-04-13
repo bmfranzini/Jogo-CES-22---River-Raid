@@ -4,13 +4,13 @@ from pygame.locals import *
 import objects
 import physics
 import time
-
+from objects import max_fuel
 # 2 - Initialize the game
 pygame.init()
 from objects import width, height
 screen = pygame.display.set_mode((width, height))
 keys = [False, False, False, False] #keyboard keys being pressed -> W (atirar),A (esquerda),S,D (direita)
-p1 = objects.Player(300,100,1,0)
+p1 = objects.Player(300,max_fuel,1,0)
 enemy_list = [] # lista que concentra todos os inimigos presentes no cenário
 fuel_list = []
 bg_margins = objects.Margin()
@@ -26,10 +26,12 @@ while 1:
     # 6 - draw the screen elements
     screen.blit(background_fig, (0,0))
     p1.draw_score(screen)
+    p1.draw_fuel(screen)
     bg_margins.draw(screen)
     p1.draw(screen)
     objects.draw_enemies(enemy_list,screen)
     objects.draw_fuel(fuel_list, screen)
+
     for j in p1.bullet_list:
         j.update()  # update bullets
         if j.y_pos<0: # remove bullets that don't fit the screen anymore
@@ -79,7 +81,7 @@ while 1:
     # 11 - Move enemies
     objects.update_enemies(enemy_list)
 
-    objects.update_fuel(fuel_list)
+    objects.update_fuel(fuel_list, p1)
 
     # 12 - Checks for collisions and deaths
     physics.check_bullet_kill(p1, enemy_list)
