@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 width = 750
 height = 750
@@ -20,10 +21,16 @@ img_type2l = pygame.image.load("Images/margin_2l.png")
 img_type2l = pygame.transform.scale(img_type2l, (250, 750))
 img_type2r = pygame.image.load("Images/margin_2r.png")
 img_type2r = pygame.transform.scale(img_type2r, (250, 750))
-game_over = pygame.image.load("Images/Game_Over.png")
+fig_game_over = pygame.image.load("Images/Game_Over.png")
 margin_left = [(0,img_type1), (0,img_type2l)]
 margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get_width(),img_type2r)]
 max_width =  max(img_type1.get_width(), img_type2r.get_width())
+
+def game_over(p1,screen):
+    screen.blit(fig_game_over, (0, 0))
+    pygame.display.flip()
+    p1.draw_score(screen)
+    time.sleep(100)
 
 class Player:
 
@@ -68,6 +75,8 @@ class Player:
         text = font.render(f'Fuel: {self.fuel}', 1, (0, 0, 0))
         textpos = text.get_rect(centerx = width / 2 + 100)
         screen.blit(text, textpos)
+    def update_score(self):
+        self.score += 1
 
 
 class Bullet:
@@ -203,8 +212,8 @@ class Fuel:
 
 def update_fuel(fuel_list, p1):
     p1.fuel -= 1
-    if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 100):
-        x0 = random.randrange(max_width, width-max_width) 
+    if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 150):
+        x0 = random.randrange(max_width, width-max_width)
         fuel_list.append(Fuel(x0,0))
     for fuel in fuel_list:
         fuel.update()

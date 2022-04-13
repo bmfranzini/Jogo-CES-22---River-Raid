@@ -3,9 +3,11 @@ import pygame
 from pygame.locals import *
 import objects
 import physics
-import time
+
 from objects import max_fuel
+
 # 2 - Initialize the game
+
 pygame.init()
 from objects import width, height
 screen = pygame.display.set_mode((width, height))
@@ -74,11 +76,11 @@ while 1:
         p1.move_right()
     if keys[2]:
         pass
-
+    p1.update_score()
     # 10 - Move background
     bg_margins.move()
 
-    # 11 - Move enemies
+    # 11 - Move enemies and fuel
     objects.update_enemies(enemy_list)
 
     objects.update_fuel(fuel_list, p1)
@@ -87,10 +89,8 @@ while 1:
     physics.check_bullet_kill(p1, enemy_list)
     physics.check_fuel_collision(p1, fuel_list)
     if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins):
-        screen.blit(objects.game_over,(0,0))
-        pygame.display.flip()
-        time.sleep(100)
-    p1.score += 1 #adicionar dentro de um método
+        objects.game_over(p1,screen)
+
 
 
 
