@@ -5,6 +5,7 @@ import objects
 import physics
 
 from objects import max_fuel
+from objects import update_global_speed
 
 # 2 - Initialize the game
 
@@ -23,6 +24,7 @@ background_fig = pygame.image.load("Images/background.png")
 
 # 4 - keep looping through
 while 1:
+    update_global_speed()
     # 5 - clear the screen before drawing it again
     screen.fill(0)
     # 6 - draw the screen elements
@@ -90,6 +92,8 @@ while 1:
     physics.check_fuel_collision(p1, fuel_list)
     if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins):
         objects.game_over(p1,screen)
+
+    # 13 - Update global speed
 
 
 

@@ -19,7 +19,7 @@ def check_enemy_collision(p1, enemy_list):  # checks if player has collides with
     player_mask = p1.get_mask()
     for enemy in enemy_list:
         enemy_mask = enemy.get_mask()
-        distance = (enemy.x_pos - p1.x_pos, enemy.y_pos-p1.y_pos)
+        distance = (int(enemy.x_pos - p1.x_pos), int(enemy.y_pos-p1.y_pos))
         collision = player_mask.overlap(enemy_mask, distance)
         if collision:
             return True
@@ -39,7 +39,7 @@ def check_fuel_collision(p1, fuel_list):
     player_mask = p1.get_mask()
     for fuel in fuel_list:
         fuel_mask = fuel.get_mask()
-        distance = (fuel.x_pos - p1.x_pos, fuel.y_pos - p1.y_pos)
+        distance = (int(fuel.x_pos - p1.x_pos), int(fuel.y_pos - p1.y_pos))
         collision = player_mask.overlap(fuel_mask, distance)
         if collision:
             p1.fuel = max_fuel

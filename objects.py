@@ -32,6 +32,12 @@ def game_over(p1,screen):
     p1.draw_score(screen)
     time.sleep(100)
 
+
+def update_global_speed():
+    global speed
+    speed = speed + 0.001
+
+
 class Player:
 
     def __init__(self, x_pos, fuel, level, score):
@@ -79,6 +85,7 @@ class Player:
         self.score += 1
 
 
+
 class Bullet:
 
     def __init__(self, x_pos, y_pos): # possivelmente adicionar velocidade
@@ -117,6 +124,7 @@ class Helicopter(Enemy):
         self.width = img_helicopter.get_width()
         self.height = img_helicopter.get_height()
         self.img = img_helicopter
+        # self.speed = speed
 
     def update(self):
         if self.dir == 'right':
