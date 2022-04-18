@@ -90,6 +90,7 @@ while 1:
     # 12 - Checks for collisions and deaths
     physics.check_bullet_kill(p1, enemy_list)
     physics.check_fuel_collision(p1, fuel_list)
+    physics.check_bullet_fuel_collision(p1, fuel_list)
     if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins):
         objects.game_over(p1,screen)
 

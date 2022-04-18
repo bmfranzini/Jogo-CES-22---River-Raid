@@ -45,3 +45,13 @@ def check_fuel_collision(p1, fuel_list):
             p1.fuel = max_fuel
             fuel_list.remove(fuel)
             break
+
+
+def check_bullet_fuel_collision(p1, fuel_list):  # checks if any bullet has reached an fuel
+    for fuel in fuel_list:
+        for bullet in p1.bullet_list:
+            if (bullet.y_pos - fuel.y_pos < fuel.height and fuel.y_pos - bullet.y_pos < bullet.height) and (bullet.x_pos - fuel.x_pos < fuel.width and fuel.x_pos - bullet.x_pos < bullet.width):
+                fuel_list.remove(fuel)
+                p1.bullet_list.remove(bullet)
+                p1.score += 100
+                break

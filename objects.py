@@ -210,6 +210,8 @@ class Fuel:
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.img = fuel_fig
+        self.height = fuel_fig.get_height()
+        self.width = fuel_fig.get_width()
 
     def update(self):
         self.y_pos += speed
