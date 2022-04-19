@@ -11,6 +11,7 @@ speed = 3
 
 bullet_fig = pygame.image.load("Images/bullet.png")
 player_fig = pygame.image.load("Images/player.png")
+player_fig= pygame.transform.scale(player_fig, (70, 70))
 fuel_fig = pygame.image.load("Images/fuel.png")
 fuel_fig = pygame.transform.scale(fuel_fig,(50,50))
 img_helicopter = pygame.image.load("Images/helicopter_enemy.png")
@@ -52,8 +53,9 @@ class Player:
         self.height = self.img.get_height()
 
     def shoot(self):
-        new_bullet = Bullet(self.x_pos + 45, self.y_pos)
+        new_bullet = Bullet(self.x_pos + 30, self.y_pos)
         self.bullet_list.append(new_bullet)
+        self.fuel -= 20
 
     def move_right(self):
         self.x_pos += 5
