@@ -91,7 +91,7 @@ while 1:
     physics.check_bullet_kill(p1, enemy_list)
     physics.check_fuel_collision(p1, fuel_list)
     physics.check_bullet_fuel_collision(p1, fuel_list)
-    if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins) or p1.fuel == -1:
+    if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins) or p1.fuel < 0:
         objects.game_over(p1,screen)
 
 

@@ -4,7 +4,7 @@ import time
 
 width = 750
 height = 750
-player_y = 600
+player_y = 650
 max_fuel = 1000
 
 speed = 3
@@ -62,9 +62,6 @@ class Player:
 
     def move_left(self):
         self.x_pos -= 5
-
-    def die(self): # possivelmente mudar para check_for_death
-        pass
 
     def draw(self, screen):
         screen.blit(self.img,(self.x_pos, self.y_pos))
@@ -173,14 +170,6 @@ class Zeppelin(Enemy):
         return pygame.mask.from_surface(self.img)
 
 
-class Bird:
-    def __init__(self, x_pos, y_pos):
-        pass
-
-    def update(self):
-        pass
-
-
 def update_enemies(enemy_list):
     if enemy_list == []:
         new_enemy = True
@@ -224,7 +213,7 @@ class Fuel:
 
 def update_fuel(fuel_list, p1):
     p1.fuel -= 1
-    if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 150):
+    if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 200):
         x0 = random.randrange(max_width, width-max_width)
         fuel_list.append(Fuel(x0,0))
     for fuel in fuel_list:
