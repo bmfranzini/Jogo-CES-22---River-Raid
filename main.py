@@ -1,26 +1,28 @@
-# 1 - Import library
+# 1 - Import library and initialize screen
 import pygame
+pygame.init()
+width = 750
+height = 750
+screen = pygame.display.set_mode((width, height))
 from pygame.locals import *
 import objects
 import physics
 
 from objects import max_fuel
 from objects import update_global_speed
+from objects import background_fig
 
 # 2 - Initialize the game
 
-pygame.init()
-from objects import width, height
-screen = pygame.display.set_mode((width, height))
 keys = [False, False, False, False] #keyboard keys being pressed -> W (atirar),A (esquerda),S,D (direita)
 p1 = objects.Player(300,max_fuel,1,0)
 enemy_list = [] # lista que concentra todos os inimigos presentes no cenário
 fuel_list = []
 bg_margins = objects.Margin()
 
-# 3 - Load images
+# 3 - Draw Menu
 
-background_fig = pygame.image.load("Images/background.png")
+objects.menu(p1, bg_margins, screen)
 
 # 4 - keep looping through
 while 1:
@@ -35,6 +37,7 @@ while 1:
     p1.draw(screen)
     objects.draw_enemies(enemy_list,screen)
     objects.draw_fuel(fuel_list, screen)
+    p1.draw_fps(screen)
 
     for j in p1.bullet_list:
         j.update()  # update bullets
@@ -92,7 +95,12 @@ while 1:
     physics.check_fuel_collision(p1, fuel_list)
     physics.check_bullet_fuel_collision(p1, fuel_list)
     if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins) or p1.fuel < 0:
-        objects.game_over(p1,screen)
+        objects.game_over(p1,screen, bg_margins)
+        p1 = objects.Player(300, max_fuel, 1, 0)
+        enemy_list = []  # lista que concentra todos os inimigos presentes no cenário
+        fuel_list = []
+        bg_margins = objects.Margin()
+        keys = [False, False, False, False]
 
 
 

@@ -10,28 +10,108 @@ max_fuel = 1000
 speed = 3
 
 bullet_fig = pygame.image.load("Images/bullet.png")
+bullet_fig.convert()
+background_fig = pygame.image.load("Images/background.png")
+background_fig.convert()
 player_fig = pygame.image.load("Images/player.png")
+player_fig.convert()
 player_fig= pygame.transform.scale(player_fig, (70, 70))
 fuel_fig = pygame.image.load("Images/fuel.png")
+fuel_fig.convert()
 fuel_fig = pygame.transform.scale(fuel_fig,(50,50))
 img_helicopter = pygame.image.load("Images/helicopter_enemy.png")
+img_helicopter.convert()
 img_zeppelin = pygame.image.load("Images/zeppelin_enemy.png")
+img_zeppelin.convert()
 img_type1 = pygame.image.load("Images/margin_1_.png")
+img_type1.convert()
 img_type1 = pygame.transform.scale(img_type1, (60, 750))
 img_type2l = pygame.image.load("Images/margin_2l.png")
+img_type2l.convert()
 img_type2l = pygame.transform.scale(img_type2l, (250, 750))
 img_type2r = pygame.image.load("Images/margin_2r.png")
 img_type2r = pygame.transform.scale(img_type2r, (250, 750))
+img_type2r.convert()
 fig_game_over = pygame.image.load("Images/Game_Over.png")
+fig_game_over.convert()
 margin_left = [(0,img_type1), (0,img_type2l)]
 margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get_width(),img_type2r)]
 max_width =  max(img_type1.get_width(), img_type2r.get_width())
 
-def game_over(p1,screen):
+def menu(p1, bg_margins, screen):
+    # white color
+    white_color = (255, 255, 255)
+
+    # light shade of the button
+    color_light = (170, 170, 170)
+
+    # dark shade of the button
+    color_dark = (100, 100, 100)
+
+    # defining a font
+    smallfont = pygame.font.SysFont('Corbel', 35)
+
+    # rendering a text written in
+    # this font
+    quit_text = smallfont.render('Quit', True, white_color)
+    start_text = smallfont.render('Start', True, white_color)
+    while (1):
+        # stores the (x,y) coordinates into
+        # the variable as a tuple
+        mouse = pygame.mouse.get_pos()
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+                # checks if a mouse is clicked
+            if event.type == pygame.MOUSEBUTTONDOWN:
+
+                # if the mouse is clicked on the
+                # button the game is terminated
+                if width / 2 - 70 <= mouse[0] <= width / 2 + 70 and height / 2 <= mouse[1] <= height / 2 + 40:
+                    pygame.quit()
+                if width / 2 - 70 <= mouse[0] <= width / 2 + 70 and height / 2 - 50 <= mouse[1] <= height / 2 - 10:
+                    break
+
+        # fills the screen with the game background
+        else:
+            screen.blit(background_fig, (0, 0))
+            p1.draw_score(screen)
+            p1.draw_fuel(screen)
+            bg_margins.draw(screen)
+            p1.draw(screen)
+
+            # if mouse is hovered on a button it changes to lighter shade
+            if width / 2 - 70 <= mouse[0] <= width / 2 + 70 and height / 2 <= mouse[1] <= height / 2 + 40:
+                pygame.draw.rect(screen, color_light, [width / 2 - 70, height / 2, 140, 40])
+
+            else:
+                pygame.draw.rect(screen, color_dark, [width / 2 - 70, height / 2, 140, 40])
+
+            if width / 2 - 70 <= mouse[0] <= width / 2 + 70 and height / 2 - 50 <= mouse[1] <= height / 2 + - 10:
+                pygame.draw.rect(screen, color_light, [width / 2 - 70, height / 2 - 50, 140, 40])
+
+            else:
+                pygame.draw.rect(screen, color_dark, [width / 2 - 70, height / 2 - 50, 140, 40])
+
+            # draw button text
+            screen.blit(quit_text, (width / 2 - 30, height / 2))
+            screen.blit(start_text, (width / 2 - 30, height / 2 - 50))
+
+            # updates the frames of the game
+            pygame.display.update()
+            continue
+
+        break
+
+def game_over(p1,screen, bg_margins):
     screen.blit(fig_game_over, (0, 0))
     pygame.display.flip()
     p1.draw_score(screen)
-    time.sleep(100)
+    time.sleep(5)
+    menu(p1, bg_margins, screen)
 
 
 def update_global_speed():
@@ -51,6 +131,8 @@ class Player:
         self.img = player_fig
         self.width = self.img.get_width()
         self.height = self.img.get_height()
+        self.font = pygame.font.SysFont("Arial", 18)
+        self.clock = pygame.time.Clock()
 
     def shoot(self):
         new_bullet = Bullet(self.x_pos + 30, self.y_pos)
@@ -80,8 +162,13 @@ class Player:
         text = font.render(f'Fuel: {self.fuel}', 1, (0, 0, 0))
         textpos = text.get_rect(centerx = width / 2 + 100)
         screen.blit(text, textpos)
+    def draw_fps(self, screen):
+        fps = str(int(self.clock.get_fps()))
+        fps_text = self.font.render(fps, 1, pygame.Color("coral"))
+        screen.blit(fps_text, (10, 0))
     def update_score(self):
         self.score += 1
+        self.clock.tick(60)
 
 
 
@@ -230,7 +317,6 @@ def draw_fuel(fuel_list, screen):
 class Margin:
     global speed
     num_of_blocks = 1
-
     def __init__(self):
         self.left_margin = [margin_left[0],margin_left[0], margin_left[1]] #lista com 3*num_of_blocks objetos
         self.right_margin = [margin_right[0],margin_right[0], margin_right[1]]
@@ -262,6 +348,7 @@ class Margin:
         for i in range(3*self.num_of_blocks):
             screen.blit(self.left_margin[i][1], (self.left_margin[i][0], self.y_plot[i]))
             screen.blit(self.right_margin[i][1], (self.right_margin[i][0], self.y_plot[i]))
+
     def get_mask(self):
         list = []
         for i in range(len(self.y_plot)):
