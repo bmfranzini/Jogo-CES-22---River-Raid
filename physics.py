@@ -1,4 +1,5 @@
-from objects import max_fuel
+from objects import max_fuel, explosion_fig
+import pygame
 def check_scenario_collision(p1, bg_margins):  # checks if player has collided with background elements
     player_mask = p1.get_mask()
     y_margin = []
@@ -26,10 +27,12 @@ def check_enemy_collision(p1, enemy_list):  # checks if player has collides with
     return False
 
 
-def check_bullet_kill(p1, enemy_list):  # checks if any bullet has reached an enemy
+def check_bullet_kill(p1, enemy_list, screen):  # checks if any bullet has reached an enemy
     for enemy in enemy_list:
         for bullet in p1.bullet_list:
             if (bullet.y_pos - enemy.y_pos < enemy.height and enemy.y_pos - bullet.y_pos < bullet.height) and (bullet.x_pos - enemy.x_pos < enemy.width and enemy.x_pos - bullet.x_pos < bullet.width):
+                screen.blit(explosion_fig, (enemy.x_pos, enemy.y_pos))
+                pygame.display.flip()
                 enemy_list.remove(enemy)
                 p1.bullet_list.remove(bullet)
                 p1.score += 100
