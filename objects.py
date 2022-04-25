@@ -7,7 +7,8 @@ height = 750
 player_y = 650
 max_fuel = 1000
 
-speed = 3
+initial_speed = 3
+speed = initial_speed
 
 bullet_fig = pygame.image.load("Images/bullet.png")
 bullet_fig.convert()
@@ -34,9 +35,12 @@ img_type2r = pygame.transform.scale(img_type2r, (250, 750))
 img_type2r.convert()
 fig_game_over = pygame.image.load("Images/Game_Over.png")
 fig_game_over.convert()
+fig_river_raid = pygame.image.load("Images/River_Raid.png")
+fig_river_raid.convert()
+fig_river_raid = pygame.transform.scale(fig_river_raid, (200, 200))
 margin_left = [(0,img_type1), (0,img_type2l)]
 margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get_width(),img_type2r)]
-max_width =  max(img_type1.get_width(), img_type2r.get_width())
+max_width = max(img_type1.get_width(), img_type2r.get_width())
 
 def menu(p1, bg_margins, screen):
     # white color
@@ -78,6 +82,7 @@ def menu(p1, bg_margins, screen):
         # fills the screen with the game background
         else:
             screen.blit(background_fig, (0, 0))
+            screen.blit(fig_river_raid,  (width/2 - fig_river_raid.get_width()/2, 50))
             p1.draw_score(screen)
             p1.draw_fuel(screen)
             bg_margins.draw(screen)
@@ -111,12 +116,14 @@ def game_over(p1,screen, bg_margins):
     pygame.display.flip()
     p1.draw_score(screen)
     time.sleep(5)
+    global speed
+    speed = initial_speed
     menu(p1, bg_margins, screen)
 
 
 def update_global_speed():
     global speed
-    speed = speed + 0.001
+    speed = speed + 0.0005
 
 
 class Player:

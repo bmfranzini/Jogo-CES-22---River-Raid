@@ -15,7 +15,7 @@ from objects import background_fig
 # 2 - Initialize the game
 
 keys = [False, False, False, False] #keyboard keys being pressed -> W (atirar),A (esquerda),S,D (direita)
-p1 = objects.Player(300,max_fuel,1,0)
+p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,1,0)
 enemy_list = [] # lista que concentra todos os inimigos presentes no cenário
 fuel_list = []
 bg_margins = objects.Margin()
@@ -96,7 +96,7 @@ while 1:
     physics.check_bullet_fuel_collision(p1, fuel_list)
     if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins) or p1.fuel < 0:
         objects.game_over(p1,screen, bg_margins)
-        p1 = objects.Player(300, max_fuel, 1, 0)
+        p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,1,0)
         enemy_list = []  # lista que concentra todos os inimigos presentes no cenário
         fuel_list = []
         bg_margins = objects.Margin()
