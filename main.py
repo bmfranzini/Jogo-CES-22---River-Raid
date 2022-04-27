@@ -19,6 +19,8 @@ p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,1,0)
 enemy_list = [] # lista que concentra todos os inimigos presentes no cenário
 fuel_list = []
 bg_margins = objects.Margin()
+pygame.mixer.music.load('song.wav')
+pygame.mixer.music.play(-1)
 
 # 3 - Draw Menu
 
@@ -88,7 +90,7 @@ while 1:
     # 11 - Move enemies and fuel
     objects.update_enemies(enemy_list,p1)
 
-    objects.update_fuel(fuel_list, p1, bg_margins)
+    objects.update_fuel(fuel_list, p1, bg_margins, screen)
 
     # 12 - Checks for collisions and deaths
     physics.check_bullet_kill(p1, enemy_list, screen)

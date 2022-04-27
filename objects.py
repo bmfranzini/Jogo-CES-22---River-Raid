@@ -159,7 +159,7 @@ class Player:
         self.bullet_list.append(new_bullet)
         self.fuel -= 20
         pygame.mixer.Sound.play(shoot_sound)
-        pygame.mixer.music.stop()
+        #pygame.mixer.music.stop()
 
     def move_right(self):
         self.x_pos += 5*self.dt/resistance_to_sensibility
@@ -320,14 +320,16 @@ class Fuel:
         return pygame.mask.from_surface(self.img)
 
 from physics import check_scenario_fuel_collision
-def update_fuel(fuel_list, p1, bg_margins):
+def update_fuel(fuel_list, p1, bg_margins, screen):
     p1.fuel -= 1
     if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 200):
-        x0 = random.randrange(0, width - fuel_fig.get_width())
+        x0 = random.randrange(img_type1.get_width(), width - fuel_fig.get_width()- img_type1.get_width())
         new_fuel = Fuel(x0, -fuel_fig.get_height())
+        new_fuel.draw((screen))
         while(check_scenario_fuel_collision(bg_margins,new_fuel)) :
-            x0 = random.randrange(0, width - new_fuel.img.get_width())
+            x0 = random.randrange(img_type1.get_width(), width - fuel_fig.get_width()- img_type1.get_width())
             new_fuel = Fuel(x0, -new_fuel.img.get_height())
+            new_fuel.draw((screen))
         fuel_list.append(new_fuel)
     for fuel in fuel_list:
         fuel.update(p1)
