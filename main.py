@@ -31,16 +31,16 @@ while 1:
     screen.fill(0)
     # 6 - draw the screen elements
     screen.blit(background_fig, (0,0))
+    bg_margins.draw(screen)
     p1.draw_score(screen)
     p1.draw_fuel(screen)
-    bg_margins.draw(screen)
     p1.draw(screen)
     objects.draw_enemies(enemy_list,screen)
     objects.draw_fuel(fuel_list, screen)
     p1.draw_fps(screen)
 
     for j in p1.bullet_list:
-        j.update()  # update bullets
+        j.update(p1)  # update bullets
         if j.y_pos<0: # remove bullets that don't fit the screen anymore
             p1.bullet_list.remove(j)
         j.draw(screen) # display bullets
@@ -83,12 +83,12 @@ while 1:
         pass
     p1.update_score()
     # 10 - Move background
-    bg_margins.move()
+    bg_margins.move(p1)
 
     # 11 - Move enemies and fuel
-    objects.update_enemies(enemy_list)
+    objects.update_enemies(enemy_list,p1)
 
-    objects.update_fuel(fuel_list, p1)
+    objects.update_fuel(fuel_list, p1, bg_margins)
 
     # 12 - Checks for collisions and deaths
     physics.check_bullet_kill(p1, enemy_list, screen)

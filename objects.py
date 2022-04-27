@@ -37,11 +37,11 @@ img_type2l = pygame.transform.scale(img_type2l, (250, 750))
 img_type2r = pygame.image.load("Images/margin_2r.png")
 img_type2r = pygame.transform.scale(img_type2r, (250, 750))
 img_type2r.convert()
-img_type3 = pygame.image.load("Images/margin_3.png")
-img_type3 = pygame.transform.scale(img_type2r, (250, 750))
+img_type3 = pygame.image.load("Images/margin_3_central.png")
+#img_type3 = pygame.transform.scale(img_type2r, (250, 750))
 img_type3.convert()
-img_type4 = pygame.image.load("Images/margin_4.png")
-img_type4 = pygame.transform.scale(img_type2r, (250, 750))
+img_type4 = pygame.image.load("Images/margin_4_central.png")
+#img_type4 = pygame.transform.scale(img_type2r, (250, 750))
 img_type4.convert()
 fig_game_over = pygame.image.load("Images/Game_Over.png")
 fig_game_over.convert()
@@ -50,7 +50,7 @@ fig_river_raid.convert()
 fig_river_raid = pygame.transform.scale(fig_river_raid, (200, 200))
 margin_left = [(0,img_type1), (0,img_type2l), (0,img_type1), (0,img_type1)]
 margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get_width(),img_type2r), (width - img_type1.get_width(),img_type1), (width - img_type1.get_width(),img_type1)]
-margin_central = [0, 0, (width/2 - img_type3.get_width(),img_type3), (width/2 - img_type4.get_width(),img_type4)]
+margin_central = [0, 0, (width/2 - img_type3.get_width()/2,img_type3), (width/2 - img_type4.get_width()/2,img_type4)]
 max_width = max(img_type1.get_width(), img_type2r.get_width())
 shoot_sound = pygame.mixer.Sound("gun_shoot.wav")
 
@@ -94,10 +94,10 @@ def menu(p1, bg_margins, screen):
         # fills the screen with the game background
         else:
             screen.blit(background_fig, (0, 0))
-            screen.blit(fig_river_raid,  (width/2 - fig_river_raid.get_width()/2, 50))
             p1.draw_score(screen)
             p1.draw_fuel(screen)
             bg_margins.draw(screen)
+            screen.blit(fig_river_raid, (width / 2 - fig_river_raid.get_width() / 2, 50))
             p1.draw(screen)
 
             # if mouse is hovered on a button it changes to lighter shade
@@ -288,9 +288,9 @@ def update_enemies(enemy_list, p1):
         temp2 = random.choice([1, 2])
         x0 = random.randrange(0, width)
         if temp1 == 1:
-            enemy = Helicopter(x0, 0, 'right') if temp2 == 1 else Helicopter(width, 0, 'left')
+            enemy = Helicopter(x0, 0, 'right') if temp2 == 1 else Helicopter(width, -img_helicopter.get_height(), 'left')
         else:
-            enemy = Zeppelin(x0, 0, 'right') if temp2 == 1 else Zeppelin(width, 0, 'left')
+            enemy = Zeppelin(x0, 0, 'right') if temp2 == 1 else Zeppelin(width, -img_zeppelin.get_height(), 'left')
         enemy_list.append(enemy)
     for enemy in enemy_list:
         enemy.update(p1)
@@ -319,11 +319,16 @@ class Fuel:
     def get_mask(self):
         return pygame.mask.from_surface(self.img)
 
-def update_fuel(fuel_list, p1):
+from physics import check_scenario_fuel_collision
+def update_fuel(fuel_list, p1, bg_margins):
     p1.fuel -= 1
     if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 200):
-        x0 = random.randrange(max_width, width-max_width)
-        fuel_list.append(Fuel(x0,0))
+        x0 = random.randrange(0, width - fuel_fig.get_width())
+        new_fuel = Fuel(x0, -fuel_fig.get_height())
+        while(check_scenario_fuel_collision(bg_margins,new_fuel)) :
+            x0 = random.randrange(0, width - new_fuel.img.get_width())
+            new_fuel = Fuel(x0, -new_fuel.img.get_height())
+        fuel_list.append(new_fuel)
     for fuel in fuel_list:
         fuel.update(p1)
         if fuel.y_pos > height:
@@ -341,40 +346,50 @@ class Margin:
     def __init__(self):
         self.left_margin = [margin_left[0],margin_left[0], margin_left[1]] #lista com 3*num_of_blocks objetos
         self.right_margin = [margin_right[0],margin_right[0], margin_right[1]]
+        self.central_margin = [margin_central[0],margin_central[0] , margin_central[1]]
         self.y = 0
         self.y_plot = [0,0,0]#lista com 3*num_of_blocks que armazena o y de plot de cada um dos blocos
 
     def move(self, p1):
         self.y += speed*p1.dt/resistance_to_sensibility # updates reference position
-        for i in range(3):
+        for i in range(3*self.num_of_blocks):
             self.y_plot[i] = (self.y + height * (self.num_of_blocks - 1 - i) / self.num_of_blocks) % (3 * height) - height / self.num_of_blocks
-        if self.y%(3*height) == 2*height: # updates first set of blocks when it is not visible
+        if (self.y%(3*height) - 2*height < speed*p1.dt/resistance_to_sensibility and self.y%(3*height) - 2*height >= 0): # updates first set of blocks when it is not visible
 
             for j in range(self.num_of_blocks):
                 temp = random.choice(range(len(margin_right)))
                 self.left_margin[j] = margin_left[temp]
                 self.right_margin[j] = margin_right[temp]
-        elif self.y%(3*height) == 0: # updates second set of blocks when it is not visible
+                self.central_margin[j] = margin_central[temp]
+        elif (self.y%(3*height) < speed*p1.dt/resistance_to_sensibility): # updates second set of blocks when it is not visible
             for j in range(self.num_of_blocks, 2 * self.num_of_blocks):
                 temp = random.choice(range(len(margin_right)))
                 self.left_margin[j] = margin_left[temp]
                 self.right_margin[j] = margin_right[temp]
-        elif self.y%(3*height) == height: # updates third set of blocks when it is not visible
+                self.central_margin[j] = margin_central[temp]
+        elif (self.y%(3*height) - height < speed*p1.dt/resistance_to_sensibility and self.y%(3*height) - height >= 0): # updates third set of blocks when it is not visible
             for j in range(2*self.num_of_blocks, 3 * self.num_of_blocks):
                 temp = random.choice(range(len(margin_right)))
                 self.left_margin[j] = margin_left[temp]
                 self.right_margin[j] = margin_right[temp]
+                self.central_margin[j] = margin_central[temp]
 
     def draw(self, screen):
         for i in range(3*self.num_of_blocks):
             screen.blit(self.left_margin[i][1], (self.left_margin[i][0], self.y_plot[i]))
             screen.blit(self.right_margin[i][1], (self.right_margin[i][0], self.y_plot[i]))
+            if(self.central_margin[i] != 0):
+                screen.blit(self.central_margin[i][1], (self.central_margin[i][0], self.y_plot[i]))
 
     def get_mask(self):
         list = []
         for i in range(len(self.y_plot)):
             if self.y_plot[i] >= player_y - height and self.y_plot[i] <= player_y:
-                list = [(self.left_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.left_margin[i][1])),
+                if(self.central_margin[i] != 0):
+                    list = [(self.left_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.left_margin[i][1])), (self.central_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.central_margin[i][1])),
+                            (self.right_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.right_margin[i][1]))]
+                else:
+                    list = [(self.left_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.left_margin[i][1])),
                         (self.right_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.right_margin[i][1]))]
         return list
 
