@@ -6,6 +6,7 @@ width = 750
 height = 750
 player_y = 650
 max_fuel = 1000
+resistance_to_sensibility = 15
 
 initial_speed = 3
 speed = initial_speed
@@ -36,14 +37,22 @@ img_type2l = pygame.transform.scale(img_type2l, (250, 750))
 img_type2r = pygame.image.load("Images/margin_2r.png")
 img_type2r = pygame.transform.scale(img_type2r, (250, 750))
 img_type2r.convert()
+img_type3 = pygame.image.load("Images/margin_3.png")
+img_type3 = pygame.transform.scale(img_type2r, (250, 750))
+img_type3.convert()
+img_type4 = pygame.image.load("Images/margin_4.png")
+img_type4 = pygame.transform.scale(img_type2r, (250, 750))
+img_type4.convert()
 fig_game_over = pygame.image.load("Images/Game_Over.png")
 fig_game_over.convert()
 fig_river_raid = pygame.image.load("Images/River_Raid.png")
 fig_river_raid.convert()
 fig_river_raid = pygame.transform.scale(fig_river_raid, (200, 200))
-margin_left = [(0,img_type1), (0,img_type2l)]
-margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get_width(),img_type2r)]
+margin_left = [(0,img_type1), (0,img_type2l), (0,img_type1), (0,img_type1)]
+margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get_width(),img_type2r), (width - img_type1.get_width(),img_type1), (width - img_type1.get_width(),img_type1)]
+margin_central = [0, 0, (width/2 - img_type3.get_width(),img_type3), (width/2 - img_type4.get_width(),img_type4)]
 max_width = max(img_type1.get_width(), img_type2r.get_width())
+shoot_sound = pygame.mixer.Sound("gun_shoot.wav")
 
 def menu(p1, bg_margins, screen):
     # white color
@@ -143,17 +152,20 @@ class Player:
         self.height = self.img.get_height()
         self.font = pygame.font.SysFont("Arial", 18)
         self.clock = pygame.time.Clock()
+        self.dt = 0 # used to stabilize fps
 
     def shoot(self):
         new_bullet = Bullet(self.x_pos + 30, self.y_pos)
         self.bullet_list.append(new_bullet)
         self.fuel -= 20
+        pygame.mixer.Sound.play(shoot_sound)
+        pygame.mixer.music.stop()
 
     def move_right(self):
-        self.x_pos += 5
+        self.x_pos += 5*self.dt/resistance_to_sensibility
 
     def move_left(self):
-        self.x_pos -= 5
+        self.x_pos -= 5*self.dt/resistance_to_sensibility
 
     def draw(self, screen):
         screen.blit(self.img,(self.x_pos, self.y_pos))
@@ -178,7 +190,7 @@ class Player:
         screen.blit(fps_text, (10, 0))
     def update_score(self):
         self.score += 1
-        self.clock.tick(60)
+        self.dt = self.clock.tick(60)
 
 
 class Bullet:
@@ -190,8 +202,8 @@ class Bullet:
         self.height = bullet_fig.get_height()
         self.img = bullet_fig
 
-    def update(self):
-        self.y_pos -= 5
+    def update(self, p1):
+        self.y_pos -= 5*p1.dt/resistance_to_sensibility
 
     def draw(self, screen):
         screen.blit(self.img, (self.x_pos, self.y_pos))
@@ -221,12 +233,12 @@ class Helicopter(Enemy):
         self.height = img_helicopter.get_height()
         self.img = img_helicopter
 
-    def update(self):
+    def update(self, p1):
         if self.dir == 'right' and self.y_pos > self.y0_mov:
-            self.x_pos += self.x_speed
+            self.x_pos += self.x_speed*p1.dt/resistance_to_sensibility
         elif self.dir == 'left' and self.y_pos > self.y0_mov:
-            self.x_pos -= self.x_speed
-        self.y_pos += speed
+            self.x_pos -= self.x_speed*p1.dt/resistance_to_sensibility
+        self.y_pos += speed*p1.dt/resistance_to_sensibility
 
     def draw(self,screen):
         if self.dir == 'left':
@@ -248,12 +260,12 @@ class Zeppelin(Enemy):
         self.height = img_zeppelin.get_height()
         self.img = img_zeppelin
 
-    def update(self):
+    def update(self, p1):
         if self.dir == 'right' and self.y_pos > self.y0_mov:
-            self.x_pos += self.x_speed
+            self.x_pos += self.x_speed*p1.dt/resistance_to_sensibility
         elif self.dir == 'left' and self.y_pos > self.y0_mov:
-            self.x_pos -= self.x_speed
-        self.y_pos += speed
+            self.x_pos -= self.x_speed*p1.dt/resistance_to_sensibility
+        self.y_pos += speed*p1.dt/resistance_to_sensibility
 
     def draw(self, screen):
         if self.dir == 'left':
@@ -266,7 +278,7 @@ class Zeppelin(Enemy):
         return pygame.mask.from_surface(self.img)
 
 
-def update_enemies(enemy_list):
+def update_enemies(enemy_list, p1):
     if enemy_list == []:
         new_enemy = True
     else:
@@ -281,7 +293,7 @@ def update_enemies(enemy_list):
             enemy = Zeppelin(x0, 0, 'right') if temp2 == 1 else Zeppelin(width, 0, 'left')
         enemy_list.append(enemy)
     for enemy in enemy_list:
-        enemy.update()
+        enemy.update(p1)
         if enemy.y_pos > height:
             enemy_list.remove(enemy)
         elif enemy.x_pos > width or enemy.x_pos<0:
@@ -300,8 +312,8 @@ class Fuel:
         self.height = fuel_fig.get_height()
         self.width = fuel_fig.get_width()
 
-    def update(self):
-        self.y_pos += speed
+    def update(self, p1):
+        self.y_pos += speed*p1.dt/resistance_to_sensibility
     def draw(self, screen):
         screen.blit(self.img, (self.x_pos, self.y_pos))
     def get_mask(self):
@@ -313,7 +325,7 @@ def update_fuel(fuel_list, p1):
         x0 = random.randrange(max_width, width-max_width)
         fuel_list.append(Fuel(x0,0))
     for fuel in fuel_list:
-        fuel.update()
+        fuel.update(p1)
         if fuel.y_pos > height:
             fuel_list.remove(fuel)
         elif fuel.x_pos > width or fuel.x_pos<0:
@@ -332,8 +344,8 @@ class Margin:
         self.y = 0
         self.y_plot = [0,0,0]#lista com 3*num_of_blocks que armazena o y de plot de cada um dos blocos
 
-    def move(self):
-        self.y += speed # updates reference position
+    def move(self, p1):
+        self.y += speed*p1.dt/resistance_to_sensibility # updates reference position
         for i in range(3):
             self.y_plot[i] = (self.y + height * (self.num_of_blocks - 1 - i) / self.num_of_blocks) % (3 * height) - height / self.num_of_blocks
         if self.y%(3*height) == 2*height: # updates first set of blocks when it is not visible
