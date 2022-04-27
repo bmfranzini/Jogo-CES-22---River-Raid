@@ -181,7 +181,6 @@ class Player:
         self.clock.tick(60)
 
 
-
 class Bullet:
 
     def __init__(self, x_pos, y_pos): # possivelmente adicionar velocidade
@@ -204,6 +203,7 @@ class Enemy: # Classe pai
         self.y_pos = y_pos
         self.dir = dir
         self.x_speed = x_speed # precisa ser tal que inimigos sempre colidam com player
+        self.y0_mov = random.randrange(0, int(height/2))
 
     def flip(self):
         if self.dir == 'right':
@@ -215,17 +215,16 @@ class Enemy: # Classe pai
 class Helicopter(Enemy):
     global speed
 
-    def __init__(self, x_pos, y_pos, dir, x_speed):
+    def __init__(self, x_pos, y_pos, dir, x_speed = random.randrange(375, 425)/100):
         super().__init__(x_pos, y_pos, dir, x_speed)
         self.width = img_helicopter.get_width()
         self.height = img_helicopter.get_height()
         self.img = img_helicopter
-        # self.speed = speed
 
     def update(self):
-        if self.dir == 'right':
+        if self.dir == 'right' and self.y_pos > self.y0_mov:
             self.x_pos += self.x_speed
-        elif self.dir == 'left':
+        elif self.dir == 'left' and self.y_pos > self.y0_mov:
             self.x_pos -= self.x_speed
         self.y_pos += speed
 
@@ -243,16 +242,16 @@ class Helicopter(Enemy):
 class Zeppelin(Enemy):
     global speed
 
-    def __init__(self, x_pos, y_pos, dir, x_speed):
+    def __init__(self, x_pos, y_pos, dir, x_speed = random.randrange(275, 325)/100):
         super().__init__(x_pos, y_pos, dir, x_speed)
         self.width = img_zeppelin.get_width()
         self.height = img_zeppelin.get_height()
         self.img = img_zeppelin
 
     def update(self):
-        if self.dir == 'right':
+        if self.dir == 'right' and self.y_pos > self.y0_mov:
             self.x_pos += self.x_speed
-        elif self.dir == 'left':
+        elif self.dir == 'left' and self.y_pos > self.y0_mov:
             self.x_pos -= self.x_speed
         self.y_pos += speed
 
@@ -277,9 +276,9 @@ def update_enemies(enemy_list):
         temp2 = random.choice([1, 2])
         x0 = random.randrange(0, width)
         if temp1 == 1:
-            enemy = Helicopter(x0, 0, 'right', 4) if temp2 == 1 else Helicopter(width, 0, 'left', 4)
+            enemy = Helicopter(x0, 0, 'right') if temp2 == 1 else Helicopter(width, 0, 'left')
         else:
-            enemy = Zeppelin(x0, 0, 'right', 3) if temp2 == 1 else Zeppelin(width, 0, 'left', 3)
+            enemy = Zeppelin(x0, 0, 'right') if temp2 == 1 else Zeppelin(width, 0, 'left')
         enemy_list.append(enemy)
     for enemy in enemy_list:
         enemy.update()
