@@ -38,10 +38,10 @@ img_type2r = pygame.image.load("Images/margin_2r.png")
 img_type2r = pygame.transform.scale(img_type2r, (250, 750))
 img_type2r.convert()
 img_type3 = pygame.image.load("Images/margin_3_central.png")
-img_type3 = pygame.transform.scale(img_type3, (300, 300))
+img_type3 = pygame.transform.scale(img_type3, (200, 300))
 img_type3.convert()
 img_type4 = pygame.image.load("Images/margin_4_central.png")
-img_type4 = pygame.transform.scale(img_type4, (500, 500))
+img_type4 = pygame.transform.scale(img_type4, (450, 500))
 img_type4.convert()
 fig_game_over = pygame.image.load("Images/Game_Over.png")
 fig_game_over.convert()
@@ -51,9 +51,18 @@ fig_river_raid = pygame.transform.scale(fig_river_raid, (200, 200))
 margin_left = [(0,img_type1), (0,img_type2l), (0,img_type1), (0,img_type1)]
 margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get_width(),img_type2r), (width - img_type1.get_width(),img_type1), (width - img_type1.get_width(),img_type1)]
 margin_central = [0, 0, (width/2 - img_type3.get_width()/2,img_type3), (width/2 - img_type4.get_width()/2,img_type4)]
-max_width = max(img_type1.get_width(), img_type2r.get_width())
 shoot_sound = pygame.mixer.Sound("gun_shoot.wav")
 
+
+def draw_objects(screen, p1, bg_margins, enemy_list, fuel_list):
+    screen.blit(background_fig, (0, 0))
+    bg_margins.draw(screen)
+    p1.draw_score(screen)
+    p1.draw_fuel(screen)
+    p1.draw(screen)
+    draw_enemies(enemy_list, screen)
+    draw_fuel(fuel_list, screen)
+    p1.draw_fps(screen)
 
 def menu(p1, bg_margins, screen):
     # white color
@@ -95,9 +104,9 @@ def menu(p1, bg_margins, screen):
         # fills the screen with the game background
         else:
             screen.blit(background_fig, (0, 0))
+            bg_margins.draw(screen)
             p1.draw_score(screen)
             p1.draw_fuel(screen)
-            bg_margins.draw(screen)
             screen.blit(fig_river_raid, (width / 2 - fig_river_raid.get_width() / 2, 50))
             p1.draw(screen)
 
@@ -146,7 +155,6 @@ class Player:
         self.x_pos = x_pos
         self.y_pos = player_y
         self.fuel = fuel
-        self.level = level
         self.score = score
         self.bullet_list = []
         self.img = player_fig
@@ -161,7 +169,6 @@ class Player:
         self.bullet_list.append(new_bullet)
         self.fuel -= 20
         pygame.mixer.Sound.play(shoot_sound)
-        # pygame.mixer.music.stop()
 
     def move_right(self):
         self.x_pos += 5*self.dt/resistance_to_sensibility
@@ -199,7 +206,7 @@ class Player:
 
 class Bullet:
 
-    def __init__(self, x_pos, y_pos): # possivelmente adicionar velocidade
+    def __init__(self, x_pos, y_pos):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.width = bullet_fig.get_width()
@@ -292,9 +299,9 @@ def update_enemies(enemy_list, p1):
         temp2 = random.choice([1, 2])
         x0 = random.randrange(0, width)
         if temp1 == 1:
-            enemy = Helicopter(x0, 0, 'right') if temp2 == 1 else Helicopter(width, -img_helicopter.get_height(), 'left')
+            enemy = Helicopter(x0, -img_helicopter.get_height(), 'right') if temp2 == 1 else Helicopter(width, -img_helicopter.get_height(), 'left')
         else:
-            enemy = Zeppelin(x0, 0, 'right') if temp2 == 1 else Zeppelin(width, -img_zeppelin.get_height(), 'left')
+            enemy = Zeppelin(x0, -img_zeppelin.get_height(), 'right') if temp2 == 1 else Zeppelin(width, -img_zeppelin.get_height(), 'left')
         enemy_list.append(enemy)
     for enemy in enemy_list:
         enemy.update(p1)
@@ -332,21 +339,19 @@ from physics import check_scenario_fuel_collision
 
 def update_fuel(fuel_list, p1, bg_margins, screen):
     p1.fuel -= 1
-    if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 200):
-        x0 = random.randrange(img_type1.get_width(), width - fuel_fig.get_width()- img_type1.get_width())
-        new_fuel = Fuel(x0, -fuel_fig.get_height())
-        new_fuel.draw((screen))
-        while(check_scenario_fuel_collision(bg_margins,new_fuel)) :
+    if fuel_list == [] and (random.random() < 0.0015 or p1.fuel< 250):
+        while(1):
             x0 = random.randrange(img_type1.get_width(), width - fuel_fig.get_width()- img_type1.get_width())
-            new_fuel = Fuel(x0, -new_fuel.img.get_height())
+            new_fuel = Fuel(x0, -fuel_fig.get_height())
             new_fuel.draw((screen))
-        fuel_list.append(new_fuel)
+
+            if(not check_scenario_fuel_collision(bg_margins,new_fuel)):
+                fuel_list.append(new_fuel)
+                break
     for fuel in fuel_list:
         fuel.update(p1)
         if fuel.y_pos > height:
             fuel_list.remove(fuel)
-        elif fuel.x_pos > width or fuel.x_pos<0:
-            fuel.flip()
 
 
 def draw_fuel(fuel_list, screen):
@@ -399,12 +404,12 @@ class Margin:
     def get_mask(self):
         list = []
         for i in range(len(self.y_plot)):
-            if self.y_plot[i] >= player_y - height and self.y_plot[i] <= player_y:
+            if self.y_plot[i] >= - height and self.y_plot[i] <= player_y: #player_y - height
                 if(self.central_margin[i] != 0):
-                    list = [(self.left_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.left_margin[i][1])), (self.central_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.central_margin[i][1])),
-                            (self.right_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.right_margin[i][1]))]
+                    list.append([(self.left_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.left_margin[i][1])), (self.central_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.central_margin[i][1])),
+                            (self.right_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.right_margin[i][1]))])
                 else:
-                    list = [(self.left_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.left_margin[i][1])),
-                        (self.right_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.right_margin[i][1]))]
+                    list.append([(self.left_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.left_margin[i][1])),
+                        (self.right_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.right_margin[i][1]))])
         return list
 

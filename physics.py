@@ -1,22 +1,23 @@
-from objects import max_fuel, explosion_fig
+from objects import max_fuel, explosion_fig, height, player_y
 import pygame
 crash_sound = pygame.mixer.Sound("crash.wav")
-
 
 def check_scenario_collision(p1, bg_margins):  # checks if player has collided with background elements
     player_mask = p1.get_mask()
     y_margin = []
     masks = []
     x_margin = []
-    for i in bg_margins.get_mask():
-        x_margin.append(i[0])
-        y_margin.append(i[1])
-        masks.append(i[2])
+    for list in bg_margins.get_mask():
+        if list[0][1] >= player_y - height:
+            for i in list:
+                x_margin.append(i[0])
+                y_margin.append(i[1])
+                masks.append(i[2])
     distance = []
-    for i in range(len(bg_margins.get_mask())):
-        distance.append((int(x_margin[i] - p1.x_pos), int(y_margin[i]-p1.y_pos)))
+    for i in range(len(masks)):
+        distance.append((int(x_margin[i] - p1.x_pos), int(y_margin[i] - p1.y_pos)))
     collision = []
-    for i in range(len(bg_margins.get_mask())):
+    for i in range(len(masks)):
         collision.append(player_mask.overlap(masks[i], distance[i]))
         if (collision[i]):
             pygame.mixer.Sound.play(crash_sound)
@@ -29,15 +30,18 @@ def check_scenario_fuel_collision(bg_margins, fuel):  # checks if player has col
     y_margin = []
     masks = []
     x_margin = []
-    for i in bg_margins.get_mask():
-        x_margin.append(i[0])
-        y_margin.append(i[1])
-        masks.append(i[2])
+
+    for list in bg_margins.get_mask():
+        if list[0][1] < player_y - height:
+            for i in list:
+                x_margin.append(i[0])
+                y_margin.append(i[1])
+                masks.append(i[2])
     distance = []
-    for i in range(len(bg_margins.get_mask())):
-        distance.append((int(x_margin[i] - fuel.x_pos), int(y_margin[i]-fuel.y_pos)))
+    for i in range(len(masks)):
+        distance.append((int(x_margin[i] - fuel.x_pos), int(y_margin[i] - fuel.y_pos)))
     collision = []
-    for i in range(len(bg_margins.get_mask())):
+    for i in range(len(masks)):
         collision.append(fuel_mask.overlap(masks[i], distance[i]))
         if (collision[i]):
             return True

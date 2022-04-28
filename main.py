@@ -8,15 +8,13 @@ from pygame.locals import *
 import objects
 import physics
 
-from objects import max_fuel
-from objects import update_global_speed
-from objects import background_fig
+from objects import max_fuel, update_global_speed, draw_objects
 
 # 2 - Initialize the game
 
-keys = [False, False, False, False] #keyboard keys being pressed -> W (atirar),A (esquerda),S,D (direita)
+keys = [False, False, False, False] #keyboard keys being pressed -> W (shoot),A (left),S,D (right)
 p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,1,0)
-enemy_list = [] # lista que concentra todos os inimigos presentes no cenário
+enemy_list = [] # list that keeps current enemies from screen
 fuel_list = []
 bg_margins = objects.Margin()
 pygame.mixer.music.load('song.wav')
@@ -32,14 +30,7 @@ while 1:
     # 5 - clear the screen before drawing it again
     screen.fill(0)
     # 6 - draw the screen elements
-    screen.blit(background_fig, (0,0))
-    bg_margins.draw(screen)
-    p1.draw_score(screen)
-    p1.draw_fuel(screen)
-    p1.draw(screen)
-    objects.draw_enemies(enemy_list,screen)
-    objects.draw_fuel(fuel_list, screen)
-    p1.draw_fps(screen)
+    draw_objects(screen, p1, bg_margins, enemy_list, fuel_list)
 
     for j in p1.bullet_list:
         j.update(p1)  # update bullets
@@ -97,9 +88,10 @@ while 1:
     physics.check_fuel_collision(p1, fuel_list)
     physics.check_bullet_fuel_collision(p1, fuel_list)
     if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins) or p1.fuel < 0:
+        draw_objects(screen, p1, bg_margins, enemy_list, fuel_list)
         objects.game_over(p1,screen, bg_margins)
         p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,1,0)
-        enemy_list = []  # lista que concentra todos os inimigos presentes no cenário
+        enemy_list = []
         fuel_list = []
         bg_margins = objects.Margin()
         keys = [False, False, False, False]
