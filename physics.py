@@ -2,6 +2,7 @@ from objects import max_fuel, explosion_fig
 import pygame
 crash_sound = pygame.mixer.Sound("crash.wav")
 
+
 def check_scenario_collision(p1, bg_margins):  # checks if player has collided with background elements
     player_mask = p1.get_mask()
     y_margin = []
@@ -21,6 +22,7 @@ def check_scenario_collision(p1, bg_margins):  # checks if player has collided w
             pygame.mixer.Sound.play(crash_sound)
             return True
     return False
+
 
 def check_scenario_fuel_collision(bg_margins, fuel):  # checks if player has collided with background elements
     fuel_mask = fuel.get_mask()
@@ -65,6 +67,7 @@ def check_bullet_kill(p1, enemy_list, screen):  # checks if any bullet has reach
                 pygame.mixer.Sound.play(crash_sound)
                 p1.score += 100
                 break
+
 
 def check_fuel_collision(p1, fuel_list):
     player_mask = p1.get_mask()

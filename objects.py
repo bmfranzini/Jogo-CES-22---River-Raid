@@ -38,10 +38,10 @@ img_type2r = pygame.image.load("Images/margin_2r.png")
 img_type2r = pygame.transform.scale(img_type2r, (250, 750))
 img_type2r.convert()
 img_type3 = pygame.image.load("Images/margin_3_central.png")
-#img_type3 = pygame.transform.scale(img_type2r, (250, 750))
+img_type3 = pygame.transform.scale(img_type3, (300, 300))
 img_type3.convert()
 img_type4 = pygame.image.load("Images/margin_4_central.png")
-#img_type4 = pygame.transform.scale(img_type2r, (250, 750))
+img_type4 = pygame.transform.scale(img_type4, (500, 500))
 img_type4.convert()
 fig_game_over = pygame.image.load("Images/Game_Over.png")
 fig_game_over.convert()
@@ -53,6 +53,7 @@ margin_right = [(width - img_type1.get_width(),img_type1), (width-img_type2r.get
 margin_central = [0, 0, (width/2 - img_type3.get_width()/2,img_type3), (width/2 - img_type4.get_width()/2,img_type4)]
 max_width = max(img_type1.get_width(), img_type2r.get_width())
 shoot_sound = pygame.mixer.Sound("gun_shoot.wav")
+
 
 def menu(p1, bg_margins, screen):
     # white color
@@ -123,6 +124,7 @@ def menu(p1, bg_margins, screen):
 
         break
 
+
 def game_over(p1,screen, bg_margins):
     screen.blit(fig_game_over, (0, 0))
     pygame.display.flip()
@@ -159,7 +161,7 @@ class Player:
         self.bullet_list.append(new_bullet)
         self.fuel -= 20
         pygame.mixer.Sound.play(shoot_sound)
-        #pygame.mixer.music.stop()
+        # pygame.mixer.music.stop()
 
     def move_right(self):
         self.x_pos += 5*self.dt/resistance_to_sensibility
@@ -184,10 +186,12 @@ class Player:
         text = font.render(f'Fuel: {self.fuel}', 1, (0, 0, 0))
         textpos = text.get_rect(centerx = width / 2 + 100)
         screen.blit(text, textpos)
+
     def draw_fps(self, screen):
         fps = str(int(self.clock.get_fps()))
         fps_text = self.font.render(fps, 1, pygame.Color("coral"))
         screen.blit(fps_text, (10, 0))
+
     def update_score(self):
         self.score += 1
         self.dt = self.clock.tick(60)
@@ -304,6 +308,7 @@ def draw_enemies(enemy_list, screen):
     for enemy in enemy_list:
         enemy.draw(screen)
 
+
 class Fuel:
     def __init__(self, x_pos, y_pos):
         self.x_pos = x_pos
@@ -314,12 +319,17 @@ class Fuel:
 
     def update(self, p1):
         self.y_pos += speed*p1.dt/resistance_to_sensibility
+
     def draw(self, screen):
         screen.blit(self.img, (self.x_pos, self.y_pos))
+
     def get_mask(self):
         return pygame.mask.from_surface(self.img)
 
+
 from physics import check_scenario_fuel_collision
+
+
 def update_fuel(fuel_list, p1, bg_margins, screen):
     p1.fuel -= 1
     if fuel_list == [] and (random.random() < 0.001 or p1.fuel< 200):
@@ -338,13 +348,16 @@ def update_fuel(fuel_list, p1, bg_margins, screen):
         elif fuel.x_pos > width or fuel.x_pos<0:
             fuel.flip()
 
+
 def draw_fuel(fuel_list, screen):
     for fuel in fuel_list:
         fuel.draw(screen)
 
+
 class Margin:
     global speed
     num_of_blocks = 1
+
     def __init__(self):
         self.left_margin = [margin_left[0],margin_left[0], margin_left[1]] #lista com 3*num_of_blocks objetos
         self.right_margin = [margin_right[0],margin_right[0], margin_right[1]]
