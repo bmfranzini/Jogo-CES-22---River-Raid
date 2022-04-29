@@ -138,7 +138,7 @@ def game_over(p1,screen, bg_margins):
     screen.blit(fig_game_over, (0, 0))
     pygame.display.flip()
     p1.draw_score(screen)
-    time.sleep(5)
+    time.sleep(3)
     global speed
     speed = initial_speed
     menu(p1, bg_margins, screen)
