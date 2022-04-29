@@ -25,14 +25,14 @@ def check_scenario_collision(p1, bg_margins):  # checks if player has collided w
     return False
 
 
-def check_scenario_fuel_collision(bg_margins, fuel):  # checks if player has collided with background elements
+def check_scenario_fuel_collision(bg_margins, fuel):  # checks if new fuel tank coincides with any background elements
     fuel_mask = fuel.get_mask()
     y_margin = []
     masks = []
     x_margin = []
 
     for list in bg_margins.get_mask():
-        if list[0][1] <= fuel.y_pos :
+        if list[0][1] <= fuel.y_pos:
             for i in list:
                 x_margin.append(i[0])
                 y_margin.append(i[1])

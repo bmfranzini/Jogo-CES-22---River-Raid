@@ -299,15 +299,20 @@ def update_enemies(enemy_list, p1): # updates the position from all the enemies 
         temp2 = random.choice([1, 2])
         x0 = random.randrange(-max(img_zeppelin.get_width(), img_helicopter.get_width()), width)
         if temp1 == 1:
-            enemy = Helicopter(x0, -img_helicopter.get_height(), 'right') if temp2 == 1 else Helicopter(width, -img_helicopter.get_height(), 'left')
+            if temp2 == 1:
+                enemy = Helicopter(x0, -img_helicopter.get_height(), 'right')
+            else:
+                enemy = Helicopter(x0, -img_helicopter.get_height(), 'left')
+        elif temp2 == 1:
+            enemy = Zeppelin(x0, -img_zeppelin.get_height(), 'right')
         else:
-            enemy = Zeppelin(x0, -img_zeppelin.get_height(), 'right') if temp2 == 1 else Zeppelin(width, -img_zeppelin.get_height(), 'left')
+            enemy = Zeppelin(x0, -img_zeppelin.get_height(), 'left')
         enemy_list.append(enemy)
     for enemy in enemy_list:
         enemy.update(p1)
         if enemy.y_pos > height:
             enemy_list.remove(enemy)
-        elif enemy.x_pos > width or enemy.x_pos< -max(img_zeppelin.get_width(), img_helicopter.get_width()):
+        elif (enemy.x_pos > width and enemy.dir == 'right') or (enemy.x_pos < -max(img_zeppelin.get_width(), img_helicopter.get_width()) and enemy.dir == 'left'):
             enemy.flip()
 
 
