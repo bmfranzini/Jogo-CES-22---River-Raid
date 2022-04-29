@@ -54,7 +54,7 @@ margin_central = [0, 0, (width/2 - img_type3.get_width()/2,img_type3), (width/2 
 shoot_sound = pygame.mixer.Sound("gun_shoot.wav")
 
 
-def draw_objects(screen, p1, bg_margins, enemy_list, fuel_list):
+def draw_objects(screen, p1, bg_margins, enemy_list, fuel_list): # displays all the objects in the screen
     screen.blit(background_fig, (0, 0))
     bg_margins.draw(screen)
     p1.draw_score(screen)
@@ -64,7 +64,7 @@ def draw_objects(screen, p1, bg_margins, enemy_list, fuel_list):
     draw_fuel(fuel_list, screen)
     p1.draw_fps(screen)
 
-def menu(p1, bg_margins, screen):
+def menu(p1, bg_margins, screen): # draws and control menu that is displayed in the beginning and after a game over
     # white color
     white_color = (255, 255, 255)
 
@@ -151,7 +151,7 @@ def update_global_speed():
 
 class Player:
 
-    def __init__(self, x_pos, fuel, level, score):
+    def __init__(self, x_pos, fuel, score):
         self.x_pos = x_pos
         self.y_pos = player_y
         self.fuel = fuel
@@ -188,7 +188,7 @@ class Player:
         textpos = text.get_rect(centerx = width / 2 - 100)
         screen.blit(text, textpos)
 
-    def draw_fuel(self, screen):
+    def draw_fuel(self, screen): # displays the remaining fuel percentage
         font = pygame.font.Font(None, 36)
         text = font.render(f'Fuel: {self.fuel}', 1, (0, 0, 0))
         textpos = text.get_rect(centerx = width / 2 + 100)
@@ -199,7 +199,7 @@ class Player:
         fps_text = self.font.render(fps, 1, pygame.Color("coral"))
         screen.blit(fps_text, (10, 0))
 
-    def update_score(self):
+    def update_score(self): # displays the player score
         self.score += 1
         self.dt = self.clock.tick(60)
 
@@ -220,12 +220,12 @@ class Bullet:
         screen.blit(self.img, (self.x_pos, self.y_pos))
 
 
-class Enemy: # Classe pai
+class Enemy: # Father Class
     def __init__(self, x_pos, y_pos, dir, x_speed):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.dir = dir
-        self.x_speed = x_speed # precisa ser tal que inimigos sempre colidam com player
+        self.x_speed = x_speed
         self.y0_mov = random.randrange(0, int(height/2))
 
     def flip(self):
@@ -289,15 +289,15 @@ class Zeppelin(Enemy):
         return pygame.mask.from_surface(self.img)
 
 
-def update_enemies(enemy_list, p1):
+def update_enemies(enemy_list, p1): # updates the position from all the enemies in enemy_list and creates new enemies, if necessary
     if enemy_list == []:
         new_enemy = True
     else:
-        new_enemy = random.random() < 0.01/(len(enemy_list))**2
+        new_enemy = (random.random() < 0.01/(len(enemy_list))**2.3) and enemy_list[-1].y_pos > 0
     if new_enemy:
         temp1 = random.choice([1, 2])
         temp2 = random.choice([1, 2])
-        x0 = random.randrange(0, width)
+        x0 = random.randrange(-max(img_zeppelin.get_width(), img_helicopter.get_width()), width)
         if temp1 == 1:
             enemy = Helicopter(x0, -img_helicopter.get_height(), 'right') if temp2 == 1 else Helicopter(width, -img_helicopter.get_height(), 'left')
         else:
@@ -307,7 +307,7 @@ def update_enemies(enemy_list, p1):
         enemy.update(p1)
         if enemy.y_pos > height:
             enemy_list.remove(enemy)
-        elif enemy.x_pos > width or enemy.x_pos<0:
+        elif enemy.x_pos > width or enemy.x_pos< -max(img_zeppelin.get_width(), img_helicopter.get_width()):
             enemy.flip()
 
 
@@ -337,7 +337,7 @@ class Fuel:
 from physics import check_scenario_fuel_collision
 
 
-def update_fuel(fuel_list, p1, bg_margins, screen):
+def update_fuel(fuel_list, p1, bg_margins, screen): # updates the position from all the enemies in enemy_list and creates new enemies, if necessary
     p1.fuel -= 1
     if fuel_list == [] and (random.random() < 0.0015 or p1.fuel< 250):
         while(1):
@@ -364,11 +364,11 @@ class Margin:
     num_of_blocks = 1
 
     def __init__(self):
-        self.left_margin = [margin_left[0],margin_left[0], margin_left[1]] #lista com 3*num_of_blocks objetos
+        self.left_margin = [margin_left[0],margin_left[0], margin_left[1]] #list with 3*num_of_blocks objects
         self.right_margin = [margin_right[0],margin_right[0], margin_right[1]]
         self.central_margin = [margin_central[0],margin_central[0] , margin_central[1]]
         self.y = 0
-        self.y_plot = [0,0,0]#lista com 3*num_of_blocks que armazena o y de plot de cada um dos blocos
+        self.y_plot = [0,0,0]#list with 3*num_of_blocks elements that stores the y of plot of each one of the blockes
 
     def move(self, p1):
         self.y += speed*p1.dt/resistance_to_sensibility # updates reference position
@@ -404,7 +404,7 @@ class Margin:
     def get_mask(self):
         list = []
         for i in range(len(self.y_plot)):
-            if self.y_plot[i] >= - height and self.y_plot[i] <= player_y: #player_y - height
+            if self.y_plot[i] >= - height and self.y_plot[i] <= player_y:
                 if(self.central_margin[i] != 0):
                     list.append([(self.left_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.left_margin[i][1])), (self.central_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.central_margin[i][1])),
                             (self.right_margin[i][0], self.y_plot[i], pygame.mask.from_surface(self.right_margin[i][1]))])

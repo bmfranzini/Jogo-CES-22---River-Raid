@@ -13,7 +13,7 @@ from objects import max_fuel, update_global_speed, draw_objects
 # 2 - Initialize the game
 
 keys = [False, False, False, False] #keyboard keys being pressed -> W (shoot),A (left),S,D (right)
-p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,1,0)
+p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,0)
 enemy_list = [] # list that keeps current enemies from screen
 fuel_list = []
 bg_margins = objects.Margin()
@@ -64,7 +64,6 @@ while 1:
             elif event.key == K_d:
                 keys[3] = True
 
-
     # 9 - Move player
     if keys[0]:
         p1.shoot()
@@ -74,6 +73,7 @@ while 1:
         p1.move_right()
     if keys[2]:
         pass
+
     p1.update_score()
     # 10 - Move background
     bg_margins.move(p1)
@@ -90,7 +90,8 @@ while 1:
     if physics.check_enemy_collision(p1,enemy_list) or physics.check_scenario_collision(p1,bg_margins) or p1.fuel < 0:
         draw_objects(screen, p1, bg_margins, enemy_list, fuel_list)
         objects.game_over(p1,screen, bg_margins)
-        p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,1,0)
+        # 13 - Resets the player after death
+        p1 = objects.Player((width - objects.player_fig.get_width())/2,max_fuel,0)
         enemy_list = []
         fuel_list = []
         bg_margins = objects.Margin()

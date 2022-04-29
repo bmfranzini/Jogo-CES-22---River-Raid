@@ -32,7 +32,7 @@ def check_scenario_fuel_collision(bg_margins, fuel):  # checks if player has col
     x_margin = []
 
     for list in bg_margins.get_mask():
-        if list[0][1] < player_y - height:
+        if list[0][1] <= fuel.y_pos :
             for i in list:
                 x_margin.append(i[0])
                 y_margin.append(i[1])
